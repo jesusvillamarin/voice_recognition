@@ -11,16 +11,18 @@ def voice_recognition():
     print('Initializing Voice Recognition')
     with sr.Microphone() as source:
         voice_data = ''
-        audio = ''
         audio = recognizer.listen(source)
         try:
             print('Say something')
-            voice_data = recognizer.recognize_sphinx(audio)
+            voice_data = recognizer.recognize_google(audio)
+            answer = input('Funciono?')
+            print(answer)
         except sr.UnknownValueError:
             print('An error has occurred')
         except sr.RequestError:
             print('Voice recognition service is down😣')
-    return voice_data
+
+        return voice_data
 
 
 def recognize_action(voice_data):
