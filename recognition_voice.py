@@ -1,45 +1,74 @@
-import speech_recognition as sr
-from time import ctime
-import webbrowser
-r =  sr.Recognizer()
+'''
+    Requeriments:
+        * python -m pip install speechrecognition
+        * python -m pip install pyaudio
+        * python -m pip install gtts
+        * python -m pip install playsound
 
+    Install with ANACONDA
+        * conda install -c conda-forge speechrecognition
+        * conda install -c anaconda pyaudio
+        --- NO FOUND TO gTTS and PlaySound
+'''
+
+import speech_recognition as sr
+from gtts import gTTS
+import playsound
+import os
+import random
+
+from time import ctime
+import time
+import webbrowser
+
+
+r =  sr.Recognizer()
 
 def voice_recognition(ask = False): 
     recognition_result = ''
     with sr.Microphone() as source:
-        if ask: print(ask) 
-        else: print('¿Te puedo ayudar en algo?')
+        if ask: bojack_speak(ask) 
+        else: bojack_speak('¿Can i Help u?')
+        r.adjust_for_ambient_noise(source, duration=1)
         audio_data = r.listen(source)
         try:
-            recognition_result = r.recognize_google(audio_data, language='es-CO')
+            recognition_result = r.recognize_google(audio_data, language="es_CO")
         except sr.UnknownValueError:
-            print('Lo siento, no escuche que dijiste!')
+            bojack_speak('I\'m sorry, I don\'t listen you!')
         except sr.RequestError():
-            print('Me estoy tomando un descanso! Intenta mas tarde')
+            bojack_speak('I\'m taking a break! Try later')
 
     return recognition_result
 
 def recognize_action(action_data):
     action_data = action_data.lower()
-    print(action_data)
-    if 'adiós' in action_data:
-        print('Hasta luego, fue un gusto servirle')
+    if 'bye' in action_data:
+        bojack_speak('See you later, it was a pleasure serving you')
         exit()
-    if 'qué hora es' in action_data: 
-        print(f'El tiempo actual es: {ctime()}')
-    if 'buscar' in action_data:
-        to_search = voice_recognition('¿Que quisieras buscar?')
+    if 'what time is it' in action_data: 
+        bojack_speak(f'The current time is: {ctime()}')
+    if 'search' in action_data:
+        to_search = voice_recognition('¿What would you like to look for??')
         url = f'https://google.com/search?q={to_search}'
         webbrowser.get().open(url)
-        print(f'Esto fue lo que encontro para: {to_search}')
-    if 'encontrar ubicación' in action_data:
-        location = voice_recognition('¿Cual es la ubicación?')
+        bojack_speak(f'This is what I found for: {to_search}')
+    if 'find location' in action_data:
+        location = voice_recognition('¿What is the location?')
         url = f'https://google.nl/maps/place/{location}/&amp'
         webbrowser.get().open(url)
-        print(f'Esto fue lo que encontro para: {location}')
+        bojack_speak(f'This is what I found for: {location}')
+
+def bojack_speak(audio_string=""):
+    tts = gTTS(text=audio_string, lang='en')
+    audio_file = f'bojack_voice_{random.randint(1,10000)}.mp3' 
+    tts.save(audio_file)
+    playsound.playsound(audio_file)
+    os.remove(audio_file)
 
 if __name__ == "__main__":
-    print('Initializing Voice Recognition...')
+    time.sleep(1)
+    bojack_speak('Initializing voice recognition...')
+    bojack_speak('Welcome Jesús Villamarín')
     while True:
         action_data = voice_recognition()
         recognize_action(action_data)
